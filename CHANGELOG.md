@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## [2.0.0] - 2026-05-04
+
+### 🚀 Features
+
+- Add HowLongToBeat (`hltb`): search game lengths via the same `/api/bleed` flow as the site; optional cover image on the first result; `@bot hltb <query>` in groups (resolved with dispatcher `Me`), plain `hltb <query>` in private, plus `TextMention` / `tg://user` mentions.
+
 ## [1.0.0] - 2026-05-04
 
 ### Fork
