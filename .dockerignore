@@ -1,0 +1,12 @@
+/target
+result
+.git
+.github
+.direnv
+.env
+.env.*
+!.env.sample
+*.md
+!README.md
+flake.nix
+flake.lock
