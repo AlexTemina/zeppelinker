@@ -100,8 +100,11 @@ pub(crate) async fn handler(
 ) -> Result<(), AsyncError> {
     match command {
         Command::Help | Command::Start => {
-            bot.reply(&message, &Command::descriptions().to_string())
-                .await?;
+            let mut text = Command::descriptions().to_string();
+            text.push_str(
+                "\n\nTip: in private chat send <code>hltb Game Name</code>, or mention this bot then <code>hltb</code> and a game (e.g. <code>@my_bot hltb Elden Ring</code>).",
+            );
+            bot.reply(&message, &text).await?;
         }
         Command::Ping => {
             bot.reply(&message, "Pong").await?;

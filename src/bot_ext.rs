@@ -24,6 +24,10 @@ static BOT_ID: LazyLock<UserId> = LazyLock::new(|| {
     UserId(id)
 });
 
+pub(crate) fn telegram_bot_user_id() -> UserId {
+    *BOT_ID
+}
+
 pub(crate) trait BotExt {
     async fn reply(&self, message: &Message, text: &str) -> Result<Message, RequestError>;
     async fn try_reply(&self, message: &Message, text: &str) -> Result<Message, RequestError>;

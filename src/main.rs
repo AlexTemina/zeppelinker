@@ -4,6 +4,7 @@ mod commands;
 mod deamp;
 mod dice;
 mod fixer;
+mod hltb;
 mod instagram;
 mod logging;
 mod medium;
@@ -32,7 +33,7 @@ use teloxide::{
     dispatching::{HandlerExt, UpdateFilterExt, dialogue::GetChatId},
     dptree,
     prelude::Dispatcher,
-    types::{ChatId, Message, Update},
+    types::{ChatId, Me, Message, Update},
     update_listeners::Polling,
 };
 
@@ -56,6 +57,10 @@ async fn run() {
             dptree::entry()
                 .filter_command::<Command>()
                 .endpoint(commands::handler),
+        )
+        .branch(
+            dptree::filter(|msg: Message, me: Me| hltb::matches(&msg, &me))
+            .endpoint(hltb::handler),
         )
         .branch(
             dptree::filter(|msg: Message| {
