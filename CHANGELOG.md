@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.0.0] - 2026-05-04
+
+### Fork
+
+- Personal fork release and deployment setup
+
 ## [2.10.1] - 2026-04-22
 
 ### 🐛 Bug Fixes
