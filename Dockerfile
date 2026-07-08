@@ -1,19 +1,17 @@
 # syntax=docker/dockerfile:1
 
-FROM rust:bookworm AS builder
+FROM python:3.12-slim AS runtime
 WORKDIR /app
 
-COPY rust-toolchain.toml Cargo.toml Cargo.lock ./
-COPY src ./src
-
-ENV CARGO_REGISTRIES_CRATES_IO_PROTOCOL=sparse
-RUN cargo build --release
-
-FROM debian:bookworm-slim AS runtime
 RUN apt-get update \
     && apt-get install -y --no-install-recommends ca-certificates \
     && rm -rf /var/lib/apt/lists/*
 
-COPY --from=builder /app/target/release/zeppelinker /usr/local/bin/zeppelinker
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+
+COPY main.py .
+COPY zeppelinker ./zeppelinker
+
 USER nobody
-CMD ["/usr/local/bin/zeppelinker"]
+CMD ["python", "main.py"]
