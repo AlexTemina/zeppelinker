@@ -39,7 +39,7 @@ async def check_authorized(bot: Bot, message: Message) -> bool:
     from_user = message.from_user
     if from_user is None:
         return False
-    if from_user.id == config.BOT_OWNER_ID:
+    if config.BOT_OWNER_ID is not None and from_user.id == config.BOT_OWNER_ID:
         return True
     admins = await bot.get_chat_administrators(message.chat_id)
     return any(admin.user.id == from_user.id for admin in admins)
