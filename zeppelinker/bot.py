@@ -16,6 +16,11 @@ logging.basicConfig(
 )
 logger = logging.getLogger("zeppelinker")
 
+# httpx logs full request URLs at INFO, and every Bot API call embeds the bot
+# token in its URL path (api.telegram.org/bot<TOKEN>/...) -- silence it so the
+# token never hits stdout/Fly logs.
+logging.getLogger("httpx").setLevel(logging.WARNING)
+
 REPLACE_SKIP_TOKEN = "#skip"
 
 # Ordered the same as the Rust dispatcher's dptree branches: first match wins.
