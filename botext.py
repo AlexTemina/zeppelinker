@@ -1,9 +1,11 @@
 from __future__ import annotations
 
+import logging
 from collections.abc import Callable
 from urllib.parse import urlsplit
 from typing import NamedTuple
 
+import httpx
 from telegram import (
     Bot,
     InlineKeyboardButton,
@@ -18,10 +20,37 @@ import config
 from fixers.router import Router
 from urlutils import get_preview_url_with_suffix, get_urls_from_message, scrub_urls
 
+logger = logging.getLogger(__name__)
+
+# Telegram won't render a link-preview video above some size (untested exact cutoff;
+# 6.3MB previewed fine, 52.5MB didn't) -- pick a conservative cutoff between those.
+PREVIEW_SIZE_LIMIT_BYTES = 20 * 1024 * 1024
+
+# Fixer sites like kkclip.com serve the real redirect only to preview-fetcher-like UAs.
+_PREVIEW_FETCH_USER_AGENT = "TelegramBot (like TwitterBot)"
+
 
 class ButtonData(NamedTuple):
     label: str
     url: str
+
+
+async def _resolved_content_length(url: str) -> int | None:
+    """Size of what `url` resolves to, via a 1-byte Range request (no full download)."""
+    try:
+        async with httpx.AsyncClient(follow_redirects=True, timeout=10.0) as client:
+            async with client.stream(
+                "GET",
+                url,
+                headers={"Range": "bytes=0-0", "User-Agent": _PREVIEW_FETCH_USER_AGENT},
+            ) as resp:
+                content_range = resp.headers.get("content-range", "")
+                total = content_range.rsplit("/", 1)[-1]
+                if total.isdigit():
+                    return int(total)
+    except httpx.HTTPError:
+        pass
+    return None
 
 
 def is_self_message(message: Message) -> bool:
@@ -109,6 +138,16 @@ async def perform_replacement(
     reply_markup = None
     if button is not None:
         reply_markup = InlineKeyboardMarkup([[InlineKeyboardButton(button.label, url=button.url)]])
+
+    size = await _resolved_content_length(preview_url)
+    if size is not None and size > PREVIEW_SIZE_LIMIT_BYTES:
+        logger.warning("Skipping replacement, media too large (%d bytes): %s", size, preview_url)
+        await reply(
+            bot,
+            message,
+            "⚠️ El vídeo de este enlace pesa demasiado para que Telegram genere la vista previa aquí.",
+        )
+        return
 
     try:
         await bot.delete_message(message.chat_id, message.message_id)
