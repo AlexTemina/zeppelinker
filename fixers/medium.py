@@ -5,8 +5,8 @@ import re
 
 from telegram import Bot, Message
 
-from .. import botext
-from ..urlutils import get_urls_from_message, scrub_urls
+import botext
+from urlutils import get_urls_from_message, scrub_urls
 
 PROVIDER = os.environ.get("zeppelinker_MEDIUM_PROVIDER", "md.vern.cc")
 

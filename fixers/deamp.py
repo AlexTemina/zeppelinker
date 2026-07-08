@@ -5,8 +5,8 @@ from urllib.parse import urlsplit
 import httpx
 from telegram import Bot, Message
 
-from .. import botext
-from ..urlutils import get_urls_from_message
+import botext
+from urlutils import get_urls_from_message
 
 BASE_URL = "https://www.amputatorbot.com/api/v1/convert?gac=true&md=3&q="
 

@@ -4,9 +4,9 @@ from urllib.parse import urlsplit
 
 from telegram import Bot, Message
 
-from .. import botext
-from ..router import Router
-from ..urlutils import get_urls_from_message
+import botext
+from .router import Router
+from urlutils import get_urls_from_message
 
 DOMAINS = ["youtube.com", "www.youtube.com"]
 

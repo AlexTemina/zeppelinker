@@ -5,9 +5,9 @@ from urllib.parse import urlsplit, urlunsplit
 
 from telegram import Bot, Message
 
-from .. import botext
-from ..botext import ButtonData
-from ..router import Router
+import botext
+from botext import ButtonData
+from .router import Router
 
 PROVIDER = os.environ.get("zeppelinker_TWITTER_PROVIDER", "fixupx.com")
 

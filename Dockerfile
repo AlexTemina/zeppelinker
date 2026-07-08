@@ -10,8 +10,9 @@ RUN apt-get update \
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
-COPY main.py .
-COPY zeppelinker ./zeppelinker
+COPY main.py bot.py botext.py commands.py config.py urlutils.py ./
+COPY fixers ./fixers
+COPY hltb ./hltb
 
 USER nobody
 CMD ["python", "main.py"]

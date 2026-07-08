@@ -14,9 +14,9 @@ from telegram import (
 from telegram.constants import ChatAction, ParseMode
 from telegram.error import TelegramError
 
-from . import config
-from .router import Router
-from .urlutils import get_preview_url_with_suffix, get_urls_from_message, scrub_urls
+import config
+from fixers.router import Router
+from urlutils import get_preview_url_with_suffix, get_urls_from_message, scrub_urls
 
 
 class ButtonData(NamedTuple):

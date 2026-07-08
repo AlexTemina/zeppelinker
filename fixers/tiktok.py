@@ -4,8 +4,8 @@ import os
 
 from telegram import Bot, Message
 
-from .. import botext
-from ..router import Router
+import botext
+from .router import Router
 
 PROVIDER = os.environ.get("zeppelinker_TIKTOK_PROVIDER", "d.tnktok.com")
 

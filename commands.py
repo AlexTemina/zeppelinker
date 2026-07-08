@@ -6,8 +6,9 @@ from telegram import Bot, Message, Update
 from telegram.error import TelegramError
 from telegram.ext import CommandHandler, ContextTypes
 
-from . import botext, config
-from .state import get_state
+import botext
+import config
+from fixers.state import get_state
 
 NOT_AUTHORIZED = "You are not authorized for this action"
 

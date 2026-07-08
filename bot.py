@@ -5,10 +5,12 @@ import logging
 from telegram import Update
 from telegram.ext import Application, ContextTypes, MessageHandler, filters
 
-from . import commands, config, hltb
-from .fixers import deamp, instagram, medium, reddit, threads, tiktok, twitter, youtube
-from .state import get_state
-from .urlutils import get_urls_from_message, has_matching_urls
+import commands
+import config
+import hltb
+from fixers import deamp, instagram, medium, reddit, threads, tiktok, twitter, youtube
+from fixers.state import get_state
+from urlutils import get_urls_from_message, has_matching_urls
 
 logging.basicConfig(
     format="%(asctime)s %(levelname)s %(name)s: %(message)s",

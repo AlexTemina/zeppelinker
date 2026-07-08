@@ -10,7 +10,8 @@ from telegram import Bot, Message, MessageEntity
 from telegram.constants import ChatAction, ParseMode
 from telegram.error import TelegramError
 
-from . import botext, config
+import botext
+import config
 
 HLTB_USER_AGENT = (
     "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 "
