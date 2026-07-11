@@ -14,5 +14,5 @@ DOMAINS = ["threads.net", "threads.com"]
 URL_MATCHER = Router(["/@{user}/post/{id}"])
 
 
-async def handle(bot: Bot, message: Message) -> None:
-    await botext.perform_replacement(bot, message, URL_MATCHER, PROVIDER, None)
+async def handle(bot: Bot, message: Message) -> Message | None:
+    return await botext.perform_replacement(bot, message, URL_MATCHER, PROVIDER, None)

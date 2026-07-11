@@ -13,30 +13,30 @@ DOMAINS = ["youtube.com", "www.youtube.com"]
 URL_MATCHER = Router(["/shorts/{id}"])
 
 
-async def handle(bot: Bot, message: Message) -> None:
+async def handle(bot: Bot, message: Message) -> Message | None:
     if botext.is_self_message(message):
-        return
+        return None
     text = message.text
     if text is None:
-        return
+        return None
     user = message.from_user
     if user is None:
-        return
+        return None
     urls = get_urls_from_message(message)
     if not urls:
-        return
+        return None
     url = urls[0]
     parsed = urlsplit(url)
     domain = parsed.hostname
     if not domain:
-        return
+        return None
     match = URL_MATCHER.match(parsed.path)
     if match is None:
-        return
+        return None
     video_id = match.params.get("id")
     if not video_id:
-        return
+        return None
 
     new_text = text.replace(url, f"https://{domain}/watch?v={video_id}")
     new_text = f"{user.mention_html()}: {new_text}"
-    await botext.replace_chat_message(bot, message, new_text)
+    return await botext.replace_chat_message(bot, message, new_text)

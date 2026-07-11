@@ -28,7 +28,7 @@ def _nitter_button(url: str) -> ButtonData | None:
     return ButtonData("Ver en Nitter", button_url)
 
 
-async def handle(bot: Bot, message: Message) -> None:
-    await botext.perform_replacement(
+async def handle(bot: Bot, message: Message) -> Message | None:
+    return await botext.perform_replacement(
         bot, message, URL_MATCHER, PROVIDER, "/es", _nitter_button
     )

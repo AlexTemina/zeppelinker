@@ -22,18 +22,18 @@ def build_url(match: re.Match[str]) -> str:
     return "https://" + url
 
 
-async def handle(bot: Bot, message: Message) -> None:
+async def handle(bot: Bot, message: Message) -> Message | None:
     if botext.is_self_message(message):
-        return
+        return None
     user = message.from_user
     if user is None:
-        return
+        return None
     text = scrub_urls(message, get_urls_from_message(message))
     if text is None:
-        return
+        return None
     match = MATCH_REGEX.search(text)
     if match is None:
-        return
+        return None
     new_text = text.replace(match.group(0), build_url(match))
     new_text = f"{user.mention_html()}: {new_text}"
-    await botext.replace_chat_message(bot, message, new_text)
+    return await botext.replace_chat_message(bot, message, new_text)

@@ -26,11 +26,11 @@ def is_amp(url: str) -> bool:
     return False
 
 
-async def handle(bot: Bot, message: Message) -> None:
+async def handle(bot: Bot, message: Message) -> Message | None:
     text = message.text
     user = message.from_user
     if text is None or user is None or botext.is_self_message(message):
-        return
+        return None
 
     urls = get_urls_from_message(message)
     async with httpx.AsyncClient() as client:
@@ -39,12 +39,12 @@ async def handle(bot: Bot, message: Message) -> None:
             data = resp.json()
             if isinstance(data, list):
                 if not data:
-                    return
+                    return None
                 canonical = data[0]["canonical"]["url"]
                 text = text.replace(url, canonical)
             else:
                 # Error variant ({"errorMessage": ..., "resultCode": ...}): bail without replying.
-                return
+                return None
 
     new_text = f"{user.mention_html()}: {text}"
-    await botext.replace_chat_message(bot, message, new_text)
+    return await botext.replace_chat_message(bot, message, new_text)

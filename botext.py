@@ -105,25 +105,27 @@ async def perform_replacement(
     preview_domain: str,
     preview_path_suffix: str | None,
     get_button_data: Callable[[str], ButtonData | None] = lambda _url: None,
-) -> None:
+) -> Message | None:
+    """Returns the newly sent replacement message, or None if the original
+    message was left untouched (self-message, no match, oversized video...)."""
     if is_self_message(message):
-        return
+        return None
     urls = get_urls_from_message(message)
     if not urls:
-        return
+        return None
     text = scrub_urls(message, urls)
     if text is None:
-        return
+        return None
     user = message.from_user
     if user is None:
-        return
+        return None
     url = urls[0]
     parsed = urlsplit(url)
     domain = parsed.hostname
     if not domain:
-        return
+        return None
     if url_matcher.match(parsed.path) is None:
-        return
+        return None
 
     new_text = f"{user.mention_html()}: {text}"
     preview_url = build_preview_url(url, domain, preview_domain, preview_path_suffix)
@@ -147,7 +149,7 @@ async def perform_replacement(
             message,
             "⚠️ El vídeo de este enlace pesa demasiado para que Telegram genere la vista previa aquí.",
         )
-        return
+        return None
 
     try:
         await bot.delete_message(message.chat_id, message.message_id)
@@ -155,7 +157,7 @@ async def perform_replacement(
         pass
 
     reply_target = message.reply_to_message.message_id if message.reply_to_message else None
-    await bot.send_message(
+    return await bot.send_message(
         message.chat_id,
         new_text,
         reply_to_message_id=reply_target,

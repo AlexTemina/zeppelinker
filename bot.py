@@ -53,17 +53,31 @@ async def on_message(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None
     chat_state = get_state(message.chat_id)
     urls = get_urls_from_message(message)
 
-    if urls and chat_state.gol and not botext.is_self_message(message):
-        if gol.check_and_record(message.chat_id, urls):
-            await gol.handle(bot, message)
+    # Recorded before running any fixer so the "is this a repost" check
+    # always happens, but the actual GOL reply is sent afterwards, quoting
+    # whatever message survives -- a fixer may delete `message` and send a
+    # replacement, and citing the (by then deleted) original would leave the
+    # reply pointing at nothing.
+    is_repost = (
+        bool(urls)
+        and chat_state.gol
+        and not botext.is_self_message(message)
+        and gol.check_and_record(message.chat_id, urls)
+    )
 
+    target_message = message
+    matched_fixer = False
     for module, field in _FIXERS:
         if _should_match(message, module.DOMAINS) and getattr(chat_state, field):
-            await module.handle(bot, message)
-            return
+            matched_fixer = True
+            target_message = await module.handle(bot, message) or message
+            break
 
-    if urls and any(deamp.is_amp(url) for url in urls):
-        await deamp.handle(bot, message)
+    if not matched_fixer and urls and any(deamp.is_amp(url) for url in urls):
+        target_message = await deamp.handle(bot, message) or message
+
+    if is_repost:
+        await gol.handle(bot, target_message)
 
 
 async def on_error(update: object, context: ContextTypes.DEFAULT_TYPE) -> None:
