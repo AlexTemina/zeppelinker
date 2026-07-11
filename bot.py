@@ -7,7 +7,6 @@ from telegram.ext import Application, ContextTypes, MessageHandler, filters
 
 import commands
 import config
-import hltb
 from fixers import deamp, instagram, medium, reddit, threads, tiktok, twitter, youtube
 from fixers.state import get_state
 from urlutils import get_urls_from_message, has_matching_urls
@@ -49,10 +48,6 @@ async def on_message(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None
     if message is None:
         return
     bot = context.bot
-
-    if hltb.matches(message, bot.username):
-        await hltb.handle(bot, message, bot.username)
-        return
 
     chat_state = get_state(message.chat_id)
     for module, field in _FIXERS:

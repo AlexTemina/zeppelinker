@@ -18,7 +18,7 @@ from telegram.error import TelegramError
 
 import config
 from fixers.router import Router
-from urlutils import get_preview_url_with_suffix, get_urls_from_message, scrub_urls
+from urlutils import build_preview_url, get_urls_from_message, scrub_urls
 
 logger = logging.getLogger(__name__)
 
@@ -126,7 +126,7 @@ async def perform_replacement(
         return
 
     new_text = f"{user.mention_html()}: {text}"
-    preview_url = get_preview_url_with_suffix(url, domain, preview_domain, preview_path_suffix)
+    preview_url = build_preview_url(url, domain, preview_domain, preview_path_suffix)
     preview_options = LinkPreviewOptions(
         is_disabled=False,
         url=preview_url,

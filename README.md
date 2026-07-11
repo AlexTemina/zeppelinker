@@ -12,7 +12,7 @@ Telegram bot to replace social media links with their improved preview variants.
 | [Twitter](https://twitter.com) / [X](https://x.com) | [TweetFix](https://github.com/FixTweet/FixTweet) |
 | [YouTube Shorts](https://www.youtube.com/shorts) | Rewrite URL to normal YouTube player |
 
-It also replies with a summary from [HowLongToBeat](https://howlongtobeat.com) when mentioned with `hltb <game name>` (or plain `hltb <game name>` in a private chat).
+It also replies with a summary from [HowLongToBeat](https://howlongtobeat.com) via `/hltb <game name>`.
 
 Rewritten in Python (originally Rust, see git history) using [python-telegram-bot](https://python-telegram-bot.org/).
 

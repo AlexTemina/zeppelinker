@@ -18,7 +18,6 @@ if not BOT_TOKEN:
     raise RuntimeError("TELOXIDE_TOKEN must be defined")
 
 BOT_ID = _required_int("BOT_ID")
-BOT_NAME = os.environ.get("BOT_NAME", "").strip().lstrip("@").lower() or None
 
 
 def _optional_int(name: str) -> int | None:

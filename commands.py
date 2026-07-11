@@ -3,14 +3,26 @@ from __future__ import annotations
 from collections.abc import Callable
 
 from telegram import Bot, Message, Update
-from telegram.error import TelegramError
 from telegram.ext import CommandHandler, ContextTypes
 
 import botext
 import config
 from fixers.state import get_state
+from hltb import hltb
 
 NOT_AUTHORIZED = "You are not authorized for this action"
+
+# (fixer display name, FixerState field name) -- shared by the on/off toggle
+# commands and by /status, so both stay in sync automatically.
+_FIXERS = [
+    ("Instagram", "instagram"),
+    ("Medium", "medium"),
+    ("Reddit", "reddit"),
+    ("TikTok", "tiktok"),
+    ("Twitter", "twitter"),
+    ("YouTube", "youtube"),
+    ("Threads", "threads"),
+]
 
 TRUE_VALUES = {"true", "on", "yes", "enable"}
 FALSE_VALUES = {"false", "off", "no", "disable"}
@@ -20,6 +32,7 @@ HELP_TEXT = (
     "These commands are supported:\n"
     "/help - display this text.\n"
     "/ping - Pong?\n"
+    "/status - show on/off state of every link fixer in this chat\n"
     "/instagram - toggle Instagram link replacement\n"
     "/medium - toggle Medium link replacement\n"
     "/reddit - toggle Reddit link replacement\n"
@@ -28,9 +41,8 @@ HELP_TEXT = (
     "/tiktok - toggle TikTok link replacement\n"
     "/twitter - toggle Twitter link replacement\n"
     "/youtube - toggle YouTube link replacement\n"
-    "/threads - toggle Threads link replacement\n\n"
-    "Tip: in private chat send <code>hltb Game Name</code>, or mention this bot then "
-    "<code>hltb</code> and a game (e.g. <code>@my_bot hltb Elden Ring</code>)."
+    "/threads - toggle Threads link replacement\n"
+    "/hltb - look up a game on HowLongToBeat, e.g. /hltb Elden Ring"
 )
 
 
@@ -109,14 +121,26 @@ async def _ttv(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     await botext.reply(context.bot, update.effective_message, text)
 
 
+async def _status(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    message = update.effective_message
+    state = get_state(message.chat_id)
+    lines = ["<b>Fixer status</b>"]
+    for name, field in _FIXERS:
+        on = getattr(state, field)
+        lines.append(f"{name}: {'✅ on' if on else '❌ off'}")
+    await botext.reply(context.bot, message, "\n".join(lines))
+
+
+async def _hltb(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    query = " ".join(context.args or [])
+    await hltb.handle(context.bot, update.effective_message, query)
+
+
 def register(app) -> None:
     app.add_handler(CommandHandler(["help", "start"], _help))
     app.add_handler(CommandHandler("ping", _ping))
     app.add_handler(CommandHandler("ttv", _ttv))
-    app.add_handler(CommandHandler("instagram", _toggle_command("Instagram", "instagram")))
-    app.add_handler(CommandHandler("medium", _toggle_command("Medium", "medium")))
-    app.add_handler(CommandHandler("reddit", _toggle_command("Reddit", "reddit")))
-    app.add_handler(CommandHandler("tiktok", _toggle_command("TikTok", "tiktok")))
-    app.add_handler(CommandHandler("twitter", _toggle_command("Twitter", "twitter")))
-    app.add_handler(CommandHandler("youtube", _toggle_command("YouTube", "youtube")))
-    app.add_handler(CommandHandler("threads", _toggle_command("Threads", "threads")))
+    app.add_handler(CommandHandler("status", _status))
+    app.add_handler(CommandHandler("hltb", _hltb))
+    for name, field in _FIXERS:
+        app.add_handler(CommandHandler(field, _toggle_command(name, field)))

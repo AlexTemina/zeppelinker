@@ -29,14 +29,12 @@ def has_matching_urls(message: Message, domains: list[str]) -> bool:
     return any(check_matches_domain(url, domains) for url in get_urls_from_message(message))
 
 
-def get_preview_url(url: str, from_domain: str, to_domain: str) -> str:
+def replace_domain(url: str, from_domain: str, to_domain: str) -> str:
     return url.replace(from_domain, to_domain)
 
 
-def get_preview_url_with_suffix(
-    url: str, from_domain: str, to_domain: str, suffix: str | None
-) -> str:
-    result = get_preview_url(url, from_domain, to_domain)
+def build_preview_url(url: str, from_domain: str, to_domain: str, suffix: str | None) -> str:
+    result = replace_domain(url, from_domain, to_domain)
     if suffix:
         result += suffix
     return result

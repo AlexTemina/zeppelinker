@@ -25,10 +25,10 @@ URL_MATCHER = Router(
 def _nitter_button(url: str) -> ButtonData | None:
     parts = urlsplit(url)
     button_url = urlunsplit(parts._replace(netloc="xcancel.com"))
-    return ButtonData("View on Nitter", button_url)
+    return ButtonData("Ver en Nitter", button_url)
 
 
 async def handle(bot: Bot, message: Message) -> None:
     await botext.perform_replacement(
-        bot, message, URL_MATCHER, PROVIDER, "/en", _nitter_button
+        bot, message, URL_MATCHER, PROVIDER, "/es", _nitter_button
     )
