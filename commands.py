@@ -7,7 +7,7 @@ from telegram.ext import CommandHandler, ContextTypes
 
 import botext
 import config
-from fixers.state import get_state
+from fixers.state import get_state, set_field
 from hltb import hltb
 
 NOT_AUTHORIZED = "You are not authorized for this action"
@@ -93,7 +93,7 @@ async def _flip_filter_state(
         await botext.reply(bot, message, str(e))
         return
 
-    setattr(state, field, value)
+    set_field(message.chat_id, field, value)
     new_state = "enabled" if value else "disabled"
     await botext.reply(bot, message, f"{fixer_name} link replacement is now {new_state}")
 
