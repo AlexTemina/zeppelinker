@@ -73,7 +73,13 @@ def main() -> None:
     app = Application.builder().token(config.BOT_TOKEN).build()
 
     commands.register(app)
-    app.add_handler(MessageHandler(filters.ALL, on_message))
+    # Only brand-new messages, never edits. filters.ALL would also match
+    # edited_message updates (Telegram sends one of those, e.g. when it
+    # finishes generating a slow link preview after the message was already
+    # sent), and since the bot has no delete rights in some chats the
+    # original message is never removed -- reprocessing an edit would send a
+    # second, duplicate reply for the same link.
+    app.add_handler(MessageHandler(filters.UpdateType.MESSAGE, on_message))
     app.add_error_handler(on_error)
 
     app.run_polling(drop_pending_updates=True)
