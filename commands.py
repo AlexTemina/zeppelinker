@@ -22,6 +22,7 @@ _FIXERS = [
     ("Twitter", "twitter"),
     ("YouTube", "youtube"),
     ("Threads", "threads"),
+    ("Gol", "gol"),
 ]
 
 TRUE_VALUES = {"true", "on", "yes", "enable"}
@@ -42,6 +43,7 @@ HELP_TEXT = (
     "/twitter - toggle Twitter link replacement\n"
     "/youtube - toggle YouTube link replacement\n"
     "/threads - toggle Threads link replacement\n"
+    "/gol - toggle the GOOOOL reply when a link is posted again\n"
     "/hltb - look up a game on HowLongToBeat, e.g. /hltb Elden Ring"
 )
 

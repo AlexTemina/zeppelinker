@@ -1,14 +1,10 @@
 from __future__ import annotations
 
-import os
-import sqlite3
 from dataclasses import dataclass
 
-# Points at a Fly Volume mount in production (see fly.toml) so state survives
-# restarts and deploys; defaults to a local file for dev.
-STATE_DB_PATH = os.environ.get("STATE_DB_PATH", "state.db")
+from db import connection
 
-FIELD_NAMES = ["instagram", "medium", "reddit", "tiktok", "twitter", "youtube", "threads"]
+FIELD_NAMES = ["instagram", "medium", "reddit", "tiktok", "twitter", "youtube", "threads", "gol"]
 
 
 @dataclass
@@ -20,17 +16,25 @@ class FixerState:
     twitter: bool = True
     youtube: bool = True
     threads: bool = True
+    gol: bool = True
 
 
-def _connect() -> sqlite3.Connection:
-    conn = sqlite3.connect(STATE_DB_PATH)
+def _connect() -> None:
+    conn = connection()
     columns = ", ".join(f"{name} INTEGER NOT NULL DEFAULT 1" for name in FIELD_NAMES)
     conn.execute(f"CREATE TABLE IF NOT EXISTS fixer_state (chat_id INTEGER PRIMARY KEY, {columns})")
+
+    # Add any column that didn't exist yet in an already-deployed database
+    # (e.g. "gol" added after the table was first created in production).
+    existing = {row[1] for row in conn.execute("PRAGMA table_info(fixer_state)")}
+    for name in FIELD_NAMES:
+        if name not in existing:
+            conn.execute(f"ALTER TABLE fixer_state ADD COLUMN {name} INTEGER NOT NULL DEFAULT 1")
     conn.commit()
-    return conn
 
 
-_DB = _connect()
+_connect()
+_DB = connection()
 
 # chat_id -> FixerState, an in-memory cache over the sqlite table so every
 # message doesn't need a disk read -- only writes (toggling a fixer) hit disk.

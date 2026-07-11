@@ -5,10 +5,12 @@ import logging
 from telegram import Update
 from telegram.ext import Application, ContextTypes, MessageHandler, filters
 
+import botext
 import commands
 import config
 from fixers import deamp, instagram, medium, reddit, threads, tiktok, twitter, youtube
 from fixers.state import get_state
+from gol import gol
 from urlutils import get_urls_from_message, has_matching_urls
 
 logging.basicConfig(
@@ -48,14 +50,18 @@ async def on_message(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None
     if message is None:
         return
     bot = context.bot
-
     chat_state = get_state(message.chat_id)
+    urls = get_urls_from_message(message)
+
+    if urls and chat_state.gol and not botext.is_self_message(message):
+        if gol.check_and_record(message.chat_id, urls):
+            await gol.handle(bot, message)
+
     for module, field in _FIXERS:
         if _should_match(message, module.DOMAINS) and getattr(chat_state, field):
             await module.handle(bot, message)
             return
 
-    urls = get_urls_from_message(message)
     if urls and any(deamp.is_amp(url) for url in urls):
         await deamp.handle(bot, message)
 
